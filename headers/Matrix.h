@@ -17,8 +17,8 @@ public:
     const double& operator()(size_t r, size_t c) const;
 
     // getters
-    size_t numRows() const { return rows; }
-    size_t numCols() const { return cols; }
+    size_t getRows() const { return rows; }
+    size_t getCols() const { return cols; }
 
     // basic arithmetic
     Matrix operator+(const Matrix& other) const;

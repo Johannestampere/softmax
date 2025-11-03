@@ -38,3 +38,24 @@ Matrix SoftmaxRegressor::predict_proba(const Matrix& X) const {
     // returns a matrix where every row is one sample and each col in a row is the probability of that sample being in that class
     return expZ;
 }
+
+Matrix SoftmaxRegressor::predict(const Matrix& X) const {
+    Matrix probabilities = predict_proba(X);
+    Matrix res{probabilites.getRows(), 1};
+
+    // get max of 
+    for (size_t i = 0; i < res.getRows(); ++i) {
+        double maxVal = probabilities(i, 0);
+        size_t maxIndex = 0;
+
+        for (size_t j = 1; j < probs.numCols(); ++j) {
+            if (probabilities(i, j) > maxVal) {
+                maxVal = probabilities(i, j);
+                maxIdx = j;
+            }
+        }
+
+        res(i, 0) = static_cast<double>(maxIdx);
+    }
+}
+

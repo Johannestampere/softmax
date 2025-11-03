@@ -3,8 +3,8 @@
 
 class SoftmaxRegressor {
 private:
-    Matrix Theta; // parameter matrix (N(features) x N(classes))
-    // every columns is a theta vector for one class
+    Matrix theta; // parameter matrix (N(features) x N(classes))
+    // every column is a theta vector for one class
 
     Matrix b; // bias vector (1 x N(classes))
     double eta; // learning rate
@@ -13,7 +13,7 @@ public:
 
     SoftmaxRegressor(size_t n_features, size_t n_classes, double learning_rate=0.01);
 
-    // returns predicted class probabilites for every sample in X
+    // returns predicted class probabilites for every sample in X, using our already calculated theta and b
     //      1) computes Z = X * theta + b (bias vector)
     //      2) subtract each row's maximum value from every val in row
     //      3) exponentiate the scores

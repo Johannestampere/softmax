@@ -1,4 +1,5 @@
 #include "SoftmaxRegressor.h"
+#include <iostream>
 
 SoftmaxRegressor::SoftmaxRegressor(size_t n_features, size_t n_classes, double learning_rate):
     theta{n_features, n_classes}, b{1, n_classes}, eta{learning_rate} {}
@@ -41,21 +42,64 @@ Matrix SoftmaxRegressor::predict_proba(const Matrix& X) const {
 
 Matrix SoftmaxRegressor::predict(const Matrix& X) const {
     Matrix probabilities = predict_proba(X);
-    Matrix res{probabilites.getRows(), 1};
+    Matrix res{probabilities.getRows(), 1};
 
-    // get max of 
     for (size_t i = 0; i < res.getRows(); ++i) {
         double maxVal = probabilities(i, 0);
         size_t maxIndex = 0;
 
-        for (size_t j = 1; j < probs.numCols(); ++j) {
+        for (size_t j = 1; j < probabilities.getCols(); ++j) {
             if (probabilities(i, j) > maxVal) {
                 maxVal = probabilities(i, j);
-                maxIdx = j;
+                maxIndex = j;
             }
         }
 
-        res(i, 0) = static_cast<double>(maxIdx);
+        res(i, 0) = static_cast<double>(maxIndex);
+    }
+
+    return res;
+}
+
+void SoftmaxRegressor::fit(const Matrix& X, const Matrix& y_onehot, int epochs) {
+
+    size_t m = X.getRows(); // N(samples)
+
+    for (int e = 0; e < epochs; ++e) {
+        Matrix P = predict_proba(X);
+
+        Matrix diff = P - y_onehot; // pred error per sample
+
+        Matrix gradientTheta = (X.transpose() * diff) / static_cast<double>(m);
+        Matrix gradientB = diff.sumCols() / static_cast<double>(m);
+
+        // GD update
+        theta = theta - gradientTheta * eta;
+        b = b - gradientB * eta;
+
+        // print loss
+        if (e % 10 == 0) {
+            double loss = compute_loss(X, y_onehot);
+            cout << "Epoch " << e << " | Loss: " << loss << endl;
+        }
     }
 }
 
+double SoftmaxRegressor::compute_loss(const Matrix& X, const Matrix& y_onehot) const {
+    size_t m = X.getRows();
+
+    Matrix P = predict_proba(X);
+
+    // compute element-wise log of probs
+    Matrix logP = P.log(1e-12);
+
+    // elementwise multiply y_onehot * logP
+    double total = 0.0;
+    for (size_t i = 0; i < y_onehot.getRows(); ++i) {
+        for (size_t j = 0; j < y_onehot.getCols(); ++j) {
+            total += y_onehot(i, j) * logP(i, j);
+        }
+    }
+
+    return -total / static_cast<double>(m);
+}

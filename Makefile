@@ -1,12 +1,12 @@
 CXX = g++
-CXXFLAGS = -std=c++20 -Wall -Iinclude
+CXXFLAGS = -std=c++20 -Wall -Iheaders
 
-SRC_DIR = src
+SRC_DIR = implementations
 OBJ_DIR = build
 BIN = softmax
 
-SRCS = $(wildcard $(SRC_DIR)/*.cpp)
-OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
+SRCS := $(wildcard $(SRC_DIR)/*.cpp)
+OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
 
 all: $(BIN)
 

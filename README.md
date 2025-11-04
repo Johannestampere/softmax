@@ -1,1 +1,1 @@
-# softmax
+# Implementation of softmax regression with manual matrix ops

@@ -1,8 +1,31 @@
 #include "SoftmaxRegressor.h"
 #include <iostream>
-#if defined(__AVX2__)
+#if __AVX2__
 #include <immintrin.h>
 #endif
+#include <random>
+#include <numeric>
+#include <algorithm>
+
+using namespace std;
+
+static vector<size_t> shuffled_indices(size_t n) {
+    vector<size_t> idx(n);
+    iota(idx.begin(), idx.end(), 0);
+    shuffle(idx.begin(), idx.end(), mt19937{random_device{}()});
+    return idx;
+}
+
+static Matrix sliceRows(const Matrix& M, const vector<size_t>& idx, size_t start, size_t count) {
+    size_t cols = M.getCols();
+    Matrix out(count, cols);
+    for (size_t i = 0; i < count; ++i) {
+        for (size_t j = 0; j < cols; ++j) {
+            out(i, j) = M(idx[start + i], j);
+        }
+    }
+    return out;
+}
 
 SoftmaxRegressor::SoftmaxRegressor(size_t n_features, size_t n_classes, double learning_rate):
     theta{n_features, n_classes}, b{1, n_classes}, eta{learning_rate} {}
@@ -134,23 +157,27 @@ Matrix SoftmaxRegressor::predict(const Matrix& X) const {
     return res;
 }
 
-void SoftmaxRegressor::fit(const Matrix& X, const Matrix& y_onehot, int epochs) {
+void SoftmaxRegressor::fit(const Matrix& X, const Matrix& y_onehot, int epochs, size_t batch_size) {
+    size_t m = X.getRows();
 
-    size_t m = X.getRows(); // N(samples)
+    if (batch_size == 0) batch_size = 32;
 
     for (int e = 0; e < epochs; ++e) {
-        Matrix P = predict_proba(X);
+        auto idx = shuffled_indices(m);
 
-        Matrix diff = P - y_onehot; // pred error per sample
+        for (size_t start = 0; start < m; start += batch_size) {
+            size_t count = min(batch_size, m - start);
 
-        Matrix gradientTheta = (X.transpose() * diff) / static_cast<double>(m);
-        Matrix gradientB = diff.sumCols() / static_cast<double>(m);
+            Matrix Xb = sliceRows(X, idx, start, count);
+            Matrix yb = sliceRows(y_onehot, idx, start, count);
+            Matrix P = predict_proba(Xb);
+            Matrix diff = P - yb;
+            Matrix gradientTheta = (Xb.transpose() * diff) / static_cast<double>(count);
+            Matrix gradientB = diff.sumCols() / static_cast<double>(count);
 
-        // GD update
-        theta = theta - gradientTheta * eta;
-        b = b - gradientB * eta;
-
-        // print loss
+            theta = theta - gradientTheta * eta;
+            b = b - gradientB * eta;
+        }
         if (e % 10 == 0) {
             double loss = compute_loss(X, y_onehot);
             cout << "Epoch " << e << " | Loss: " << loss << endl;

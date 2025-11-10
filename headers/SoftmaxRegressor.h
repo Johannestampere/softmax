@@ -26,7 +26,7 @@ public:
     // training
     // y_onehot has shape (n_samples x n_classes)
     // a 1 in each row at the true class position
-    void fit(const Matrix& X, const Matrix& y_onehot, int epochs=1000);
+    void fit(const Matrix& X, const Matrix& y_onehot, int epochs=1000, size_t batch_size=32);
 
     // loss
     double compute_loss(const Matrix& X, const Matrix& y_onehot) const;

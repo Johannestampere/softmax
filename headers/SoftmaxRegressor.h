@@ -30,4 +30,6 @@ public:
 
     // loss
     double compute_loss(const Matrix& X, const Matrix& y_onehot) const;
+
+    Matrix& theta_ref() { return theta; }
 };

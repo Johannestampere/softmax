@@ -11,19 +11,19 @@ The implementation supports both standard scalar routines and **SIMD-accelerated
 Softmax Regression generalizes Logistic Regression to multi-class problems.  
 Given an input \( x \), class probabilities are computed using the softmax function:
 
-\[
+$$
 P(y = k \mid x) =
 \frac{e^{x \cdot \theta_k + b_k}}
 {\sum_j e^{x \cdot \theta_j + b_j}}
-\]
+$$
 
 Training minimizes the cross-entropy loss:
 
-\[
+$$
 J(\Theta) = -\frac{1}{m}
 \sum_{i=1}^{m} \sum_{k=1}^{K}
 y_i^{(k)} \log \, p_i^{(k)}
-\]
+$$
 
 The model uses **mini-batch gradient descent**, with dataset shuffling and per-batch updates for faster and more stable convergence.
 
@@ -49,6 +49,12 @@ The model uses **mini-batch gradient descent**, with dataset shuffling and per-b
 - **Mini-batch gradient descent** with shuffled batches  
 - Cross-entropy loss computation  
 - Probability and class label prediction  
+
+### Unit Testing
+- GoogleTest-based tests for matrix operations  
+- Prediction correctness tests  
+- Numerical gradient checking  
+- Test target integrated into the Makefile (`make test`)
 
 ---
 

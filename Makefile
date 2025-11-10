@@ -1,5 +1,12 @@
 CXX = g++
-CXXFLAGS = -std=c++20 -Wall -Iheaders
+CXXFLAGS = -std=c++20 -Wall -O3 -Iheaders
+UNAME_S := $(shell uname -s)
+UNAME_M := $(shell uname -m)
+
+# enable AVX2/FMA on x86_64, other architectures will compile scalar fallbacks
+ifeq ($(UNAME_M),x86_64)
+CXXFLAGS += -mavx2 -mfma
+endif
 
 SRC_DIR = implementations
 OBJ_DIR = build

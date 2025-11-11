@@ -4,6 +4,10 @@ A complete **Softmax (Multinomial Logistic) Regression** model built entirely in
 
 The implementation supports both standard scalar routines and **SIMD-accelerated CPU execution** using **AVX2** and **FMA** intrinsics when available.
 
+Results on the MNSIT dataset:
+
+![MNIST dataset](images/res.png)
+
 ---
 
 ## Overview
